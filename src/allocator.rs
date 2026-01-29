@@ -1,25 +1,21 @@
 use std::{
     alloc::{Layout, alloc, dealloc},
-    marker::PhantomData,
     ptr::NonNull,
 };
 
 use super::node::Node;
 
 #[allow(unused)]
-pub(super) struct Allocator<T> {
-    _marker: PhantomData<T>,
-}
+pub struct NodeAllocator;
 
 #[allow(unused)]
-impl<T> Allocator<T> {
-    pub(super) fn new() -> Self {
-        Self {
-            _marker: PhantomData,
-        }
+impl NodeAllocator {
+    pub const fn new() -> Self {
+        Self
     }
 
-    pub(super) fn allocate(&self, node: Node<T>) -> NonNull<Node<T>> {
+    #[allow(clippy::unused_self)]
+    pub fn allocate<T>(&self, node: Node<T>) -> NonNull<Node<T>> {
         let layout = Layout::new::<Node<T>>();
         let raw_ptr = unsafe { alloc(layout).cast::<Node<T>>() };
 
@@ -29,7 +25,8 @@ impl<T> Allocator<T> {
         unsafe { NonNull::new_unchecked(raw_ptr) }
     }
 
-    pub(super) fn deallocate(&self, node: NonNull<Node<T>>) {
+    #[allow(clippy::unused_self)]
+    pub fn deallocate<T>(&self, node: NonNull<Node<T>>) {
         let layout = Layout::new::<Node<T>>();
         let raw_ptr = node.as_ptr().cast::<u8>();
 
@@ -39,11 +36,11 @@ impl<T> Allocator<T> {
 
 #[cfg(test)]
 mod allocator_tests {
-    use super::{Allocator, Node};
+    use super::{Node, NodeAllocator};
 
     #[test]
     fn test_allocate_node() {
-        let allocator = Allocator::<i32>::new();
+        let allocator = NodeAllocator::new();
         let node = Node::new(1);
         let node_ptr = allocator.allocate(node);
 
