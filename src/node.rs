@@ -1,18 +1,18 @@
 use std::ptr::NonNull;
 
 #[allow(unused)]
-pub(super) type Link<T> = Option<NonNull<Node<T>>>;
+pub type Link<T> = Option<NonNull<Node<T>>>;
 
 #[allow(unused)]
-pub(super) struct Node<T> {
-    pub(super) previous: Link<T>,
-    pub(super) next: Link<T>,
-    pub(super) element: T,
+pub struct Node<T> {
+    pub previous: Link<T>,
+    pub next: Link<T>,
+    pub element: T,
 }
 
 #[allow(unused)]
 impl<T> Node<T> {
-    pub(super) fn new(element: T) -> Self {
+    pub const fn new(element: T) -> Self {
         Self {
             previous: None,
             next: None,

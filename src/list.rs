@@ -1,4 +1,4 @@
-use crate::allocator::Allocator;
+use crate::allocator::NodeAllocator;
 
 use super::node::Link;
 
@@ -7,17 +7,24 @@ pub struct LinkedList<T> {
     head: Link<T>,
     tail: Link<T>,
     size: usize,
-    allocator: Allocator<T>,
+    allocator: NodeAllocator,
 }
 
 impl<T> LinkedList<T> {
-    pub fn new() -> Self {
+    #[must_use]
+    pub const fn new() -> Self {
         Self {
             head: None,
             tail: None,
             size: 0,
-            allocator: Allocator::new(),
+            allocator: NodeAllocator::new(),
         }
+    }
+}
+
+impl<T> Default for LinkedList<T> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
