@@ -1,6 +1,5 @@
 use std::ptr::NonNull;
 
-#[allow(unused)]
 pub type Link<T> = Option<NonNull<Node<T>>>;
 
 #[allow(unused)]
@@ -10,7 +9,6 @@ pub struct Node<T> {
     pub element: T,
 }
 
-#[allow(unused)]
 impl<T> Node<T> {
     pub const fn new(element: T) -> Self {
         Self {

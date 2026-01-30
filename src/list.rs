@@ -1,8 +1,8 @@
-use crate::allocator::NodeAllocator;
+use super::{
+    allocator::NodeAllocator,
+    node::{Link, Node},
+};
 
-use super::node::Link;
-
-#[allow(unused)]
 pub struct LinkedList<T> {
     head: Link<T>,
     tail: Link<T>,
@@ -20,6 +20,40 @@ impl<T> LinkedList<T> {
             allocator: NodeAllocator::new(),
         }
     }
+
+    pub fn push_front(&mut self, element: T) {
+        let mut new_node = Node::new(element);
+
+        new_node.next = self.head;
+
+        let new_node_ptr = self.allocator.allocate(new_node);
+
+        if let Some(mut head) = self.head {
+            unsafe { head.as_mut().previous = Some(new_node_ptr) };
+        } else {
+            self.tail = Some(new_node_ptr);
+        }
+
+        self.head = Some(new_node_ptr);
+        self.size += 1;
+    }
+
+    pub fn push_back(&mut self, element: T) {
+        let mut new_node = Node::new(element);
+
+        new_node.previous = self.tail;
+
+        let new_node_ptr = self.allocator.allocate(new_node);
+
+        if let Some(mut tail) = self.tail {
+            unsafe { tail.as_mut().next = Some(new_node_ptr) };
+        } else {
+            self.head = Some(new_node_ptr);
+        }
+
+        self.tail = Some(new_node_ptr);
+        self.size += 1;
+    }
 }
 
 impl<T> Default for LinkedList<T> {
@@ -29,7 +63,22 @@ impl<T> Default for LinkedList<T> {
 }
 
 #[cfg(test)]
+mod utils {
+    use super::{LinkedList, Node};
+
+    pub fn raw_head<T>(list: &LinkedList<T>) -> &Node<T> {
+        unsafe { list.head.unwrap().as_ref() }
+    }
+
+    pub fn raw_tail<T>(list: &LinkedList<T>) -> &Node<T> {
+        unsafe { list.tail.unwrap().as_ref() }
+    }
+}
+
+#[cfg(test)]
 mod list_tests {
+    use crate::list::utils::{raw_head, raw_tail};
+
     use super::LinkedList;
 
     #[test]
@@ -39,5 +88,91 @@ mod list_tests {
         assert!(list.head.is_none());
         assert!(list.tail.is_none());
         assert_eq!(list.size, 0);
+    }
+
+    #[test]
+    fn test_push_front_one_element() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+
+        let head_ptr = raw_head(&list);
+
+        assert!(head_ptr.previous.is_none());
+        assert!(head_ptr.next.is_none());
+        assert_eq!(head_ptr.element, 1);
+
+        let tail_ptr = raw_tail(&list);
+
+        assert!(tail_ptr.previous.is_none());
+        assert!(tail_ptr.next.is_none());
+        assert_eq!(tail_ptr.element, 1);
+
+        assert_eq!(list.size, 1);
+    }
+
+    #[test]
+    fn test_push_front_two_elements() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+        list.push_front(2);
+
+        let head_ptr = raw_head(&list);
+
+        assert!(head_ptr.previous.is_none());
+        assert!(head_ptr.next.is_some());
+        assert_eq!(head_ptr.element, 2);
+
+        let tail_ptr = raw_tail(&list);
+
+        assert!(tail_ptr.previous.is_some());
+        assert!(tail_ptr.next.is_none());
+        assert_eq!(tail_ptr.element, 1);
+
+        assert_eq!(list.size, 2);
+    }
+
+    #[test]
+    fn test_push_back_one_element() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_back(1);
+
+        let head_ptr = raw_head(&list);
+
+        assert!(head_ptr.previous.is_none());
+        assert!(head_ptr.next.is_none());
+        assert_eq!(head_ptr.element, 1);
+
+        let tail_ptr = raw_tail(&list);
+
+        assert!(tail_ptr.previous.is_none());
+        assert!(tail_ptr.next.is_none());
+        assert_eq!(tail_ptr.element, 1);
+
+        assert_eq!(list.size, 1);
+    }
+
+    #[test]
+    fn test_push_back_two_elements() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_back(1);
+        list.push_back(2);
+
+        let head_ptr = raw_head(&list);
+
+        assert!(head_ptr.previous.is_none());
+        assert!(head_ptr.next.is_some());
+        assert_eq!(head_ptr.element, 1);
+
+        let tail_ptr = raw_tail(&list);
+
+        assert!(tail_ptr.previous.is_some());
+        assert!(tail_ptr.next.is_none());
+        assert_eq!(tail_ptr.element, 2);
+
+        assert_eq!(list.size, 2);
     }
 }
