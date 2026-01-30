@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::{
     allocator::NodeAllocator,
     node::{Link, Node},
@@ -89,6 +91,32 @@ impl<T> LinkedList<T> {
         let popped_element = self.allocator.deallocate(old_tail);
 
         Some(popped_element)
+    }
+}
+
+impl<T: Display> Display for LinkedList<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.size == 0 {
+            return write!(f, "[]");
+        }
+
+        write!(f, "[")?;
+
+        let mut current_node = self.head;
+
+        while let Some(node) = current_node {
+            let node_ref = unsafe { node.as_ref() };
+
+            if node_ref.next.is_some() {
+                write!(f, "{} <-> ", node_ref.element)?;
+            } else {
+                write!(f, "{}", node_ref.element)?;
+            }
+
+            current_node = node_ref.next;
+        }
+
+        write!(f, "]")
     }
 }
 
@@ -318,5 +346,75 @@ mod list_tests {
         assert!(list.head.is_none());
         assert!(list.tail.is_none());
         assert_eq!(list.size, 0);
+    }
+
+    #[test]
+    fn test_empty_list_display() {
+        let list = LinkedList::<i32>::new();
+
+        let output = format!("{list}");
+
+        assert_eq!(output, "[]");
+    }
+
+    #[test]
+    fn test_push_front_one_element_display() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+
+        assert_eq!(format!("{list}"), "[1]");
+    }
+
+    #[test]
+    fn test_push_front_two_elements_display() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+        list.push_front(2);
+
+        assert_eq!(format!("{list}"), "[2 <-> 1]");
+    }
+
+    #[test]
+    fn test_push_back_one_element_display() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_back(1);
+
+        assert_eq!(format!("{list}"), "[1]");
+    }
+
+    #[test]
+    fn test_push_back_two_elements_display() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_back(1);
+        list.push_back(2);
+
+        assert_eq!(format!("{list}"), "[1 <-> 2]");
+    }
+
+    #[test]
+    fn test_display_after_mixed_operations() {
+        let mut list = LinkedList::new();
+        list.push_front(1);
+        list.push_back(2);
+        list.pop_front();
+        list.push_front(3);
+
+        assert_eq!(format!("{list}"), "[3 <-> 2]");
+    }
+
+    #[test]
+    fn test_display_after_clearing_list() {
+        let mut list = LinkedList::new();
+
+        list.push_back(1);
+        list.push_back(2);
+        list.pop_front();
+        list.pop_front();
+
+        assert_eq!(format!("{list}"), "[]");
     }
 }
