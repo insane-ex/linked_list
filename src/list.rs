@@ -54,6 +54,42 @@ impl<T> LinkedList<T> {
         self.tail = Some(new_node_ptr);
         self.size += 1;
     }
+
+    pub fn pop_front(&mut self) -> Option<T> {
+        let old_head = self.head?;
+
+        self.head = unsafe { old_head.as_ref().next };
+
+        if let Some(mut new_head) = self.head {
+            unsafe { new_head.as_mut().previous = None };
+        } else {
+            self.tail = None;
+        }
+
+        self.size -= 1;
+
+        let popped_element = self.allocator.deallocate(old_head);
+
+        Some(popped_element)
+    }
+
+    pub fn pop_back(&mut self) -> Option<T> {
+        let old_tail = self.tail?;
+
+        self.tail = unsafe { old_tail.as_ref().previous };
+
+        if let Some(mut new_tail) = self.tail {
+            unsafe { new_tail.as_mut().next = None };
+        } else {
+            self.head = None;
+        }
+
+        self.size -= 1;
+
+        let popped_element = self.allocator.deallocate(old_tail);
+
+        Some(popped_element)
+    }
 }
 
 impl<T> Default for LinkedList<T> {
@@ -174,5 +210,113 @@ mod list_tests {
         assert_eq!(tail_ptr.element, 2);
 
         assert_eq!(list.size, 2);
+    }
+
+    #[test]
+    fn test_pop_front_empty_list() {
+        let mut list = LinkedList::<i32>::new();
+
+        assert!(list.pop_front().is_none());
+    }
+
+    #[test]
+    fn test_pop_front_one_element() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+
+        let popped_element = list.pop_front();
+
+        assert_eq!(popped_element, Some(1));
+
+        assert!(list.head.is_none());
+        assert!(list.tail.is_none());
+        assert_eq!(list.size, 0);
+    }
+
+    #[test]
+    fn test_pop_front_two_elements() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+        list.push_front(2);
+
+        let first_pop = list.pop_front();
+
+        assert_eq!(first_pop, Some(2));
+
+        let head_ptr = raw_head(&list);
+
+        assert!(head_ptr.previous.is_none());
+        assert!(head_ptr.next.is_none());
+        assert_eq!(head_ptr.element, 1);
+
+        let tail_ptr = raw_tail(&list);
+
+        assert!(tail_ptr.previous.is_none());
+        assert!(tail_ptr.next.is_none());
+        assert_eq!(tail_ptr.element, 1);
+
+        let second_pop = list.pop_front();
+
+        assert_eq!(second_pop, Some(1));
+
+        assert!(list.head.is_none());
+        assert!(list.tail.is_none());
+        assert_eq!(list.size, 0);
+    }
+
+    #[test]
+    fn test_pop_back_empty_list() {
+        let mut list = LinkedList::<i32>::new();
+
+        assert!(list.pop_back().is_none());
+    }
+
+    #[test]
+    fn test_pop_back_one_element() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_back(1);
+
+        let popped_element = list.pop_back();
+
+        assert_eq!(popped_element, Some(1));
+
+        assert!(list.head.is_none());
+        assert!(list.tail.is_none());
+        assert_eq!(list.size, 0);
+    }
+
+    #[test]
+    fn test_pop_back_two_elements() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_back(1);
+        list.push_back(2);
+
+        let first_pop = list.pop_back();
+
+        assert_eq!(first_pop, Some(2));
+
+        let head_ptr = raw_head(&list);
+
+        assert!(head_ptr.previous.is_none());
+        assert!(head_ptr.next.is_none());
+        assert_eq!(head_ptr.element, 1);
+
+        let tail_ptr = raw_tail(&list);
+
+        assert!(tail_ptr.previous.is_none());
+        assert!(tail_ptr.next.is_none());
+        assert_eq!(tail_ptr.element, 1);
+
+        let second_pop = list.pop_back();
+
+        assert_eq!(second_pop, Some(1));
+
+        assert!(list.head.is_none());
+        assert!(list.tail.is_none());
+        assert_eq!(list.size, 0);
     }
 }

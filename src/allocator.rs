@@ -26,11 +26,14 @@ impl NodeAllocator {
     }
 
     #[allow(clippy::unused_self)]
-    pub fn deallocate<T>(&self, node: NonNull<Node<T>>) {
+    pub fn deallocate<T>(&self, node: NonNull<Node<T>>) -> T {
         let layout = Layout::new::<Node<T>>();
+        let popped_element = unsafe { std::ptr::read(node.as_ptr()).element };
         let raw_ptr = node.as_ptr().cast::<u8>();
 
         unsafe { dealloc(raw_ptr, layout) }
+
+        popped_element
     }
 }
 
