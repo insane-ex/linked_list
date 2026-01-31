@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, ptr::NonNull};
 
 use super::{
     allocator::NodeAllocator,
@@ -91,6 +91,74 @@ impl<T> LinkedList<T> {
         let popped_element = self.allocator.deallocate(old_tail);
 
         Some(popped_element)
+    }
+
+    unsafe fn remove_node(&mut self, mut node: NonNull<Node<T>>) {
+        unsafe {
+            let previous_node = node.as_ref().previous;
+            let next_node = node.as_ref().next;
+
+            if let Some(mut node) = previous_node {
+                node.as_mut().next = next_node;
+            } else {
+                self.head = next_node;
+            }
+
+            if let Some(mut node) = next_node {
+                node.as_mut().previous = previous_node;
+            } else {
+                self.tail = previous_node;
+            }
+
+            node.as_mut().previous = None;
+            node.as_mut().next = None;
+
+            self.allocator.deallocate(node);
+
+            self.size -= 1;
+        }
+    }
+
+    pub fn retain<F>(&mut self, predicate: F)
+    where
+        F: Fn(&T) -> bool,
+    {
+        let mut current_node = self.head;
+
+        while let Some(node) = current_node {
+            let node_ref = unsafe { node.as_ref() };
+            let next_node = node_ref.next;
+
+            if !predicate(&node_ref.element) {
+                unsafe { self.remove_node(node) };
+            }
+
+            current_node = next_node;
+        }
+    }
+}
+
+impl<T: Clone> LinkedList<T> {
+    #[must_use]
+    pub fn filter<F>(&mut self, predicate: F) -> Self
+    where
+        F: Fn(&T) -> bool,
+    {
+        let mut current_node = self.head;
+        let mut list = Self::new();
+
+        while let Some(node) = current_node {
+            let node_ref = unsafe { node.as_ref() };
+            let next_node = node_ref.next;
+
+            if predicate(&node_ref.element) {
+                list.push_back(node_ref.element.clone());
+            }
+
+            current_node = next_node;
+        }
+
+        list
     }
 }
 
@@ -416,5 +484,39 @@ mod list_tests {
         list.pop_front();
 
         assert_eq!(format!("{list}"), "[]");
+    }
+
+    #[test]
+    fn test_retain_list() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_back(1);
+        list.push_back(2);
+        list.push_back(3);
+        list.retain(|x| x % 2 == 0);
+
+        assert_eq!(format!("{list}"), "[2]");
+
+        list.push_front(1);
+        list.push_back(3);
+        list.retain(|x| x % 2 == 1);
+
+        assert_eq!(format!("{list}"), "[1 <-> 3]");
+    }
+
+    #[test]
+    fn test_filter_list() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_back(1);
+        list.push_back(2);
+        list.push_back(3);
+        list.push_back(4);
+        list.push_back(5);
+        list.push_back(6);
+
+        let filtered_list = list.filter(|x| x % 2 == 0);
+
+        assert_eq!(format!("{filtered_list}"), "[2 <-> 4 <-> 6]");
     }
 }
