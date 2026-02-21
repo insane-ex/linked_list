@@ -538,4 +538,32 @@ mod tests {
 
         assert!(list.is_empty());
     }
+
+    #[test]
+    fn retain_even_elements() {
+        let mut list = LinkedList::new();
+
+        list.push_front(1);
+        list.push_front(2);
+        list.push_front(3);
+        list.push_front(4);
+        list.push_front(5);
+        list.retain(|x| x % 2 == 0);
+
+        assert_eq!(format!("{list}"), "[4 <-> 2]");
+    }
+
+    #[test]
+    fn retain_odd_elements() {
+        let mut list = LinkedList::new();
+
+        list.push_front(1);
+        list.push_front(2);
+        list.push_front(3);
+        list.push_front(4);
+        list.push_front(5);
+        list.retain(|x| x % 2 == 1);
+
+        assert_eq!(format!("{list}"), "[5 <-> 3 <-> 1]");
+    }
 }
