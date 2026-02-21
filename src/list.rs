@@ -73,6 +73,8 @@ impl<T> LinkedList<T> {
 
         unsafe { deallocate_node(old_head) };
 
+        self.length -= 1;
+
         Some(element)
     }
 }
