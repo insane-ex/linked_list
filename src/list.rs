@@ -335,4 +335,13 @@ mod tests {
         assert!(list.tail.is_none());
         assert_eq!(list.length, 0);
     }
+
+    #[test]
+    fn list_size() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+
+        assert_eq!(list.size(), 1);
+    }
 }
