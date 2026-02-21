@@ -185,6 +185,10 @@ impl<T> LinkedList<T> {
             current_node = next_node;
         }
     }
+
+    pub fn clear(&mut self) {
+        while self.pop_front().is_some() {}
+    }
 }
 
 impl<T: Display> Display for LinkedList<T> {
@@ -215,7 +219,7 @@ impl<T: Display> Display for LinkedList<T> {
 
 impl<T> Drop for LinkedList<T> {
     fn drop(&mut self) {
-        while self.pop_front().is_some() {}
+        self.clear();
     }
 }
 
