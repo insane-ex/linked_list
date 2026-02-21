@@ -348,4 +348,20 @@ mod tests {
 
         assert_eq!(list.size(), 1);
     }
+
+    #[test]
+    fn list_is_empty() {
+        let list = LinkedList::<i32>::new();
+
+        assert!(list.is_empty());
+    }
+
+    #[test]
+    fn list_not_is_empty() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+
+        assert!(!list.is_empty());
+    }
 }
