@@ -428,4 +428,76 @@ mod tests {
 
         assert!(!list.contains(&1));
     }
+
+    #[test]
+    fn reverse_empty_list() {
+        let mut list: LinkedList<i32> = LinkedList::new();
+
+        list.reverse();
+
+        assert!(list.pop_front().is_none());
+        assert_eq!(list.size(), 0);
+    }
+
+    #[test]
+    fn reverse_one_element() {
+        let mut list = LinkedList::new();
+
+        list.push_back(1);
+
+        list.reverse();
+
+        assert_eq!(list.size(), 1);
+        assert_eq!(list.pop_front(), Some(1));
+        assert!(list.is_empty());
+    }
+
+    #[test]
+    fn reverse_two_elements() {
+        let mut list = LinkedList::new();
+
+        list.push_back(1);
+        list.push_back(2);
+        list.reverse();
+
+        assert_eq!(list.size(), 2);
+        assert_eq!(list.pop_front(), Some(2));
+        assert_eq!(list.pop_front(), Some(1));
+        assert!(list.is_empty());
+    }
+
+    #[test]
+    fn reverse_multiple_elements() {
+        let mut list = LinkedList::new();
+
+        for i in 1..=5 {
+            list.push_back(i);
+        }
+
+        list.reverse();
+
+        for expected in (1..=5).rev() {
+            assert_eq!(list.pop_front(), Some(expected));
+        }
+
+        assert!(list.is_empty());
+    }
+
+    #[test]
+    fn reverse_twice_restores_order() {
+        let mut list = LinkedList::new();
+
+        for i in 1..=5 {
+            list.push_back(i);
+        }
+
+        list.reverse();
+        list.reverse();
+
+        for expected in 1..=5 {
+            assert_eq!(list.pop_front(), Some(expected));
+        }
+
+        assert!(list.is_empty());
+    }
 }
