@@ -2,7 +2,7 @@
 
 use std::ptr::NonNull;
 
-type Link<T> = Option<NonNull<Node<T>>>;
+pub type Link<T> = Option<NonNull<Node<T>>>;
 
 pub struct Node<T> {
     previous: Link<T>,
