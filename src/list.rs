@@ -572,4 +572,18 @@ mod tests {
 
         assert_eq!(format!("{list}"), "[5 <-> 3 <-> 1]");
     }
+
+    #[test]
+    fn clear_list() {
+        let mut list = LinkedList::new();
+
+        list.push_front(1);
+        list.push_front(2);
+        list.push_front(3);
+        list.push_front(4);
+        list.push_front(5);
+        list.clear();
+
+        assert!(list.is_empty())
+    }
 }
