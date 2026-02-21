@@ -99,11 +99,13 @@ impl<T> LinkedList<T> {
         Some(element)
     }
 
-    pub fn size(&self) -> usize {
+    #[inline]
+    pub const fn size(&self) -> usize {
         self.length
     }
 
-    pub fn is_empty(&self) -> bool {
+    #[inline]
+    pub const fn is_empty(&self) -> bool {
         self.length == 0
     }
 
@@ -126,7 +128,7 @@ impl<T> LinkedList<T> {
         false
     }
 
-    pub fn reverse(&mut self) {
+    pub const fn reverse(&mut self) {
         if self.length <= 1 {
             return;
         }
@@ -144,7 +146,7 @@ impl<T> LinkedList<T> {
             current_node = next_node;
         }
 
-        unsafe { mem::swap(&mut self.head, &mut self.tail) }
+        unsafe { mem::swap(&mut self.head, &mut self.tail) };
     }
 
     fn remove_node(&mut self, node: NonNull<Node<T>>) {

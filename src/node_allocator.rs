@@ -23,7 +23,6 @@ pub fn allocate_node<T>(node: Node<T>) -> NonNull<Node<T>> {
 pub unsafe fn deallocate_node<T>(node: NonNull<Node<T>>) {
     unsafe {
         ptr::drop_in_place(node.as_ptr());
-
-        dealloc(node.as_ptr().cast::<u8>(), Layout::new::<Node<T>>())
+        dealloc(node.as_ptr().cast::<u8>(), Layout::new::<Node<T>>());
     }
 }
