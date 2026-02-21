@@ -77,6 +77,26 @@ impl<T> LinkedList<T> {
 
         Some(element)
     }
+
+    pub fn pop_back(&mut self) -> Option<T> {
+        let old_tail = self.tail?;
+
+        self.tail = unsafe { old_tail.as_ref().previous };
+
+        if let Some(mut node) = self.tail {
+            unsafe { node.as_mut().next = None };
+        } else {
+            self.head = None;
+        }
+
+        let element = unsafe { ptr::read(&old_tail.as_ref().element) };
+
+        unsafe { deallocate_node(old_tail) };
+
+        self.length -= 1;
+
+        Some(element)
+    }
 }
 
 impl<T: Display> Display for LinkedList<T> {
