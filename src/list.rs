@@ -35,6 +35,23 @@ impl<T> LinkedList<T> {
         self.head = Some(node_ptr);
         self.length += 1;
     }
+
+    pub fn push_back(&mut self, element: T) {
+        let mut new_node = Node::new(element);
+
+        new_node.previous = self.tail;
+
+        let node_ptr = allocate_node(new_node);
+
+        if let Some(mut node) = self.tail {
+            unsafe { node.as_mut().next = Some(node_ptr) };
+        } else {
+            self.head = Some(node_ptr);
+        }
+
+        self.tail = Some(node_ptr);
+        self.length += 1;
+    }
 }
 
 #[cfg(test)]
