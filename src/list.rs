@@ -235,4 +235,42 @@ mod tests {
 
         assert_eq!(format!("{list}"), "[1 <-> 2 <-> 3]");
     }
+
+    #[test]
+    fn pop_front_one_element() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+
+        let popped_element = list.pop_front();
+
+        assert!(popped_element.is_some());
+        assert_eq!(popped_element.unwrap(), 1);
+
+        assert!(list.head.is_none());
+        assert!(list.tail.is_none());
+        assert_eq!(list.length, 0);
+    }
+
+    #[test]
+    fn pop_front_two_elements() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+        list.push_front(2);
+
+        let first_pop = list.pop_front();
+
+        assert!(first_pop.is_some());
+        assert_eq!(first_pop.unwrap(), 2);
+
+        let second_pop = list.pop_front();
+
+        assert!(second_pop.is_some());
+        assert_eq!(second_pop.unwrap(), 1);
+
+        assert!(list.head.is_none());
+        assert!(list.tail.is_none());
+        assert_eq!(list.length, 0);
+    }
 }
