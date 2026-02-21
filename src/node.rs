@@ -4,7 +4,7 @@ use std::ptr::NonNull;
 
 type Link<T> = Option<NonNull<Node<T>>>;
 
-struct Node<T> {
+pub struct Node<T> {
     previous: Link<T>,
     next: Link<T>,
     element: T,
