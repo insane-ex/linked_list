@@ -190,4 +190,26 @@ mod tests {
 
         assert_eq!(list.length, 2);
     }
+
+    #[test]
+    fn display_list_pushing_front() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+        list.push_front(2);
+        list.push_front(3);
+
+        assert_eq!(format!("{list}"), "[3 <-> 2 <-> 1]");
+    }
+
+    #[test]
+    fn display_list_pushing_back() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_back(1);
+        list.push_back(2);
+        list.push_back(3);
+
+        assert_eq!(format!("{list}"), "[1 <-> 2 <-> 3]");
+    }
 }
