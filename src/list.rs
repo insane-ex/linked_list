@@ -36,3 +36,70 @@ impl<T> LinkedList<T> {
         self.length += 1;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::node::Node;
+
+    use super::LinkedList;
+
+    fn raw_head<T>(list: &LinkedList<T>) -> &Node<T> {
+        unsafe { list.head.unwrap().as_ref() }
+    }
+
+    fn raw_tail<T>(list: &LinkedList<T>) -> &Node<T> {
+        unsafe { list.tail.unwrap().as_ref() }
+    }
+
+    #[test]
+    fn create_list() {
+        let list = LinkedList::<i32>::new();
+
+        assert!(list.head.is_none());
+        assert!(list.tail.is_none());
+        assert_eq!(list.length, 0);
+    }
+
+    #[test]
+    fn push_front_one_element() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+
+        let head_ptr = raw_head(&list);
+
+        assert!(head_ptr.previous.is_none());
+        assert!(head_ptr.next.is_none());
+        assert_eq!(head_ptr.element, 1);
+
+        let tail_ptr = raw_tail(&list);
+
+        assert!(tail_ptr.previous.is_none());
+        assert!(tail_ptr.next.is_none());
+        assert_eq!(tail_ptr.element, 1);
+
+        assert_eq!(list.length, 1);
+    }
+
+    #[test]
+    fn push_front_two_elements() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+        list.push_front(2);
+
+        let head_ptr = raw_head(&list);
+
+        assert!(head_ptr.previous.is_none());
+        assert!(head_ptr.next.is_some());
+        assert_eq!(head_ptr.element, 2);
+
+        let tail_ptr = raw_tail(&list);
+
+        assert!(tail_ptr.previous.is_some());
+        assert!(tail_ptr.next.is_none());
+        assert_eq!(tail_ptr.element, 1);
+
+        assert_eq!(list.length, 2);
+    }
+}
