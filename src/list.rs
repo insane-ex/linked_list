@@ -2,7 +2,8 @@
 
 use std::{
     fmt::{self, Display},
-    mem, ptr,
+    mem,
+    ptr::{self, NonNull},
 };
 
 use crate::node_allocator::{allocate_node, deallocate_node};
@@ -144,6 +145,43 @@ impl<T> LinkedList<T> {
         }
 
         unsafe { mem::swap(&mut self.head, &mut self.tail) }
+    }
+
+    fn remove_node(&mut self, node: NonNull<Node<T>>) {
+        let node_ref = unsafe { node.as_ref() };
+
+        if let Some(mut previous) = node_ref.previous {
+            unsafe { previous.as_mut().next = node_ref.next }
+        } else {
+            self.head = node_ref.next;
+        }
+
+        if let Some(mut next) = node_ref.next {
+            unsafe { next.as_mut().previous = node_ref.previous }
+        } else {
+            self.tail = node_ref.previous;
+        }
+
+        unsafe { deallocate_node(node) };
+
+        self.length -= 1;
+    }
+
+    pub fn retain<F>(&mut self, mut predicate: F)
+    where
+        F: FnMut(&T) -> bool,
+    {
+        let mut current_node = self.head;
+
+        while let Some(node) = current_node {
+            let next_node = unsafe { node.as_ref().next };
+
+            if !predicate(unsafe { &node.as_ref().element }) {
+                self.remove_node(node);
+            }
+
+            current_node = next_node;
+        }
     }
 }
 
