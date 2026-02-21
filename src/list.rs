@@ -2,7 +2,7 @@
 
 use std::{
     fmt::{self, Display},
-    ptr,
+    mem, ptr,
 };
 
 use crate::node_allocator::{allocate_node, deallocate_node};
@@ -123,6 +123,27 @@ impl<T> LinkedList<T> {
         }
 
         false
+    }
+
+    pub fn reverse(&mut self) {
+        if self.length <= 1 {
+            return;
+        }
+
+        let mut current_node = self.head;
+
+        while let Some(mut node) = current_node {
+            let next_node = unsafe { node.as_ref().next };
+
+            unsafe {
+                node.as_mut().next = node.as_ref().previous;
+                node.as_mut().previous = next_node;
+            }
+
+            current_node = next_node;
+        }
+
+        unsafe { mem::swap(&mut self.head, &mut self.tail) }
     }
 }
 
