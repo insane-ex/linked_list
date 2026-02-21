@@ -105,6 +105,25 @@ impl<T> LinkedList<T> {
     pub fn is_empty(&self) -> bool {
         self.length == 0
     }
+
+    pub fn contains(&self, element: &T) -> bool
+    where
+        T: PartialEq,
+    {
+        let mut current_node = self.head;
+
+        while let Some(node) = current_node {
+            let node_ref = unsafe { node.as_ref() };
+
+            if &node_ref.element == element {
+                return true;
+            }
+
+            current_node = node_ref.next;
+        }
+
+        false
+    }
 }
 
 impl<T: Display> Display for LinkedList<T> {
