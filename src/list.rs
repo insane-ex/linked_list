@@ -389,4 +389,22 @@ mod tests {
 
         assert!(!list.is_empty());
     }
+
+    #[test]
+    fn contains_return_true() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(1);
+
+        assert!(list.contains(&1));
+    }
+
+    #[test]
+    fn contains_return_false() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_front(2);
+
+        assert!(!list.contains(&1));
+    }
 }
