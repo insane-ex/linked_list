@@ -1,5 +1,7 @@
 #![allow(unused)]
 
+use std::fmt::{self, Display};
+
 use crate::node_allocator::allocate_node;
 
 use super::node::{Link, Node};
@@ -51,6 +53,32 @@ impl<T> LinkedList<T> {
 
         self.tail = Some(node_ptr);
         self.length += 1;
+    }
+}
+
+impl<T: Display> Display for LinkedList<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.length == 0 {
+            return write!(f, "[]");
+        }
+
+        write!(f, "[")?;
+
+        let mut current_node = self.head;
+
+        while let Some(node) = current_node {
+            let node_ref = unsafe { node.as_ref() };
+
+            if node_ref.next.is_some() {
+                write!(f, "{} <-> ", node_ref.element)?;
+            } else {
+                write!(f, "{}", node_ref.element)?;
+            }
+
+            current_node = node_ref.next;
+        }
+
+        write!(f, "]")
     }
 }
 
