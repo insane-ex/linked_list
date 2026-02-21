@@ -1,8 +1,11 @@
 #![allow(unused)]
 
-use std::fmt::{self, Display};
+use std::{
+    fmt::{self, Display},
+    ptr,
+};
 
-use crate::node_allocator::allocate_node;
+use crate::node_allocator::{allocate_node, deallocate_node};
 
 use super::node::{Link, Node};
 
@@ -53,6 +56,24 @@ impl<T> LinkedList<T> {
 
         self.tail = Some(node_ptr);
         self.length += 1;
+    }
+
+    pub fn pop_front(&mut self) -> Option<T> {
+        let old_head = self.head?;
+
+        self.head = unsafe { old_head.as_ref().next };
+
+        if let Some(mut node) = self.head {
+            unsafe { node.as_mut().previous = None };
+        } else {
+            self.tail = None;
+        }
+
+        let element = unsafe { ptr::read(&old_head.as_ref().element) };
+
+        unsafe { deallocate_node(old_head) };
+
+        Some(element)
     }
 }
 
