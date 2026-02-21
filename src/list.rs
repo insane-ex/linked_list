@@ -69,7 +69,7 @@ impl<T> LinkedList<T> {
             self.tail = None;
         }
 
-        let element = unsafe { ptr::read(&old_head.as_ref().element) };
+        let element = unsafe { ptr::read(&raw const old_head.as_ref().element) };
 
         unsafe { deallocate_node(old_head) };
 
@@ -89,7 +89,7 @@ impl<T> LinkedList<T> {
             self.head = None;
         }
 
-        let element = unsafe { ptr::read(&old_tail.as_ref().element) };
+        let element = unsafe { ptr::read(&raw const old_tail.as_ref().element) };
 
         unsafe { deallocate_node(old_tail) };
 

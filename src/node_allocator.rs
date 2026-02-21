@@ -11,9 +11,7 @@ pub fn allocate_node<T>(node: Node<T>) -> NonNull<Node<T>> {
     let layout = Layout::new::<Node<T>>();
     let node_ptr = unsafe { alloc(layout).cast::<Node<T>>() };
 
-    if node_ptr.is_null() {
-        panic!("Out of memory");
-    }
+    assert!(!node_ptr.is_null(), "Out of memory");
 
     unsafe {
         ptr::write(node_ptr, node);
