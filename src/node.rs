@@ -5,9 +5,9 @@ use std::ptr::NonNull;
 pub type Link<T> = Option<NonNull<Node<T>>>;
 
 pub struct Node<T> {
-    previous: Link<T>,
-    next: Link<T>,
-    element: T,
+    pub(super) previous: Link<T>,
+    pub(super) next: Link<T>,
+    pub(super) element: T,
 }
 
 impl<T> Node<T> {

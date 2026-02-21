@@ -1,6 +1,8 @@
 #![allow(unused)]
 
-use super::node::Link;
+use crate::node_allocator::allocate_node;
+
+use super::node::{Link, Node};
 
 pub struct LinkedList<T> {
     head: Link<T>,
@@ -16,18 +18,21 @@ impl<T> LinkedList<T> {
             length: 0,
         }
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::LinkedList;
+    pub fn push_front(&mut self, element: T) {
+        let mut new_node = Node::new(element);
 
-    #[test]
-    fn create_list() {
-        let list = LinkedList::<i32>::new();
+        new_node.next = self.head;
 
-        assert!(list.head.is_none());
-        assert!(list.tail.is_none());
-        assert_eq!(list.length, 0);
+        let node_ptr = allocate_node(new_node);
+
+        if let Some(mut node) = self.head {
+            unsafe { node.as_mut().previous = Some(node_ptr) };
+        } else {
+            self.tail = Some(node_ptr);
+        }
+
+        self.head = Some(node_ptr);
+        self.length += 1;
     }
 }
