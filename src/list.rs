@@ -17,3 +17,17 @@ impl<T> LinkedList<T> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::LinkedList;
+
+    #[test]
+    fn create_list() {
+        let list = LinkedList::<i32>::new();
+
+        assert!(list.head.is_none());
+        assert!(list.tail.is_none());
+        assert_eq!(list.length, 0);
+    }
+}
