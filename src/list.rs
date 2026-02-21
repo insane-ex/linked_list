@@ -119,4 +119,47 @@ mod tests {
 
         assert_eq!(list.length, 2);
     }
+
+    #[test]
+    fn push_back_one_element() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_back(1);
+
+        let head_ptr = raw_head(&list);
+
+        assert!(head_ptr.previous.is_none());
+        assert!(head_ptr.next.is_none());
+        assert_eq!(head_ptr.element, 1);
+
+        let tail_ptr = raw_tail(&list);
+
+        assert!(tail_ptr.previous.is_none());
+        assert!(tail_ptr.next.is_none());
+        assert_eq!(tail_ptr.element, 1);
+
+        assert_eq!(list.length, 1);
+    }
+
+    #[test]
+    fn push_back_two_elements() {
+        let mut list = LinkedList::<i32>::new();
+
+        list.push_back(1);
+        list.push_back(2);
+
+        let head_ptr = raw_head(&list);
+
+        assert!(head_ptr.previous.is_none());
+        assert!(head_ptr.next.is_some());
+        assert_eq!(head_ptr.element, 1);
+
+        let tail_ptr = raw_tail(&list);
+
+        assert!(tail_ptr.previous.is_some());
+        assert!(tail_ptr.next.is_none());
+        assert_eq!(tail_ptr.element, 2);
+
+        assert_eq!(list.length, 2);
+    }
 }
