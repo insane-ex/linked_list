@@ -97,6 +97,10 @@ impl<T> LinkedList<T> {
 
         Some(element)
     }
+
+    pub fn size(&self) -> usize {
+        self.length
+    }
 }
 
 impl<T: Display> Display for LinkedList<T> {
