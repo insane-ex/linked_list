@@ -133,6 +133,12 @@ impl<T: Display> Display for LinkedList<T> {
     }
 }
 
+impl<T> Drop for LinkedList<T> {
+    fn drop(&mut self) {
+        while self.pop_front().is_some() {}
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::node::Node;
